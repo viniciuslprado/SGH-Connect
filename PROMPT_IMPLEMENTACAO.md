@@ -18,6 +18,18 @@ Antes de escrever código, leia `docs/SGH_Connect_Documentacao_Arquitetural.docx
 
 Entrega: 26/11/2026 às 17h. Priorize uma aplicação **funcionando de ponta a ponta** em vez de muitas telas.
 
+## Restrições de trabalho
+
+- Projeto acadêmico: use **somente dados fictícios**. Não apresente o sistema como pronto para uso assistencial real.
+- **Antes de escrever código**, apresente o plano por etapas, a estrutura de pastas e o diagrama de dependências
+  entre módulos, conferindo com a Figura 3 do documento. Depois execute de forma incremental.
+- **Não invente evidências.** Só registre resultados de testes e comandos que você realmente executou.
+  Não diga que algo está concluído sem rodar as validações.
+- Não altere arquivos `.env` existentes sem minha autorização. Forneça um `.env.example` sem segredos.
+- **Não crie interfaces vazias** só para parecer desacoplado. Contratos só onde há dependência real entre módulos
+  (as listadas na seção 6.1 do documento).
+- Controllers finos: validação de entrada e chamada ao caso de uso. Regra de negócio fica no domínio, nunca no front-end.
+
 ## Stack (obrigatória)
 
 - Monorepo com **npm workspaces**: `apps/api`, `apps/web`, `packages/shared`
@@ -75,6 +87,16 @@ sgh-connect/
 11. **Internar paciente** é um único caso de uso transacional: obter leito → `leito.ocupar()` → criar internação →
     salvar → outbox. Leito tem coluna `versao` (lock otimista); conflito retorna **409**.
 12. `PacienteResumoDto` expõe CPF **mascarado**; CPF completo só dentro do módulo Pacientes.
+13. **Registro clínico só em atendimento aberto** (conascência de execução): a regra fica em
+    `Atendimento.registrarEvolucao()` no domínio; atendimento finalizado rejeita com erro de domínio → HTTP 422.
+14. **Alta é atômica** (conascência temporal): encerrar a internação e colocar o leito em HIGIENIZACAO
+    acontecem na **mesma transação**, junto com o evento `AltaRegistrada` no outbox.
+15. **Datas** trafegam em **ISO 8601 UTC** em toda a API (conascência de convenção explícita e documentada no Swagger).
+16. **Auditoria** de ações relevantes (login, criar/cancelar consulta, abrir/finalizar atendimento, leitura de prontuário,
+    internar, alta, fechar conta): porta `RegistroAuditoria` em `apps/api/src/shared/auditoria/`, gravando
+    ator, ação, entidade, entidadeId e data — **nunca o texto clínico**. Consulta em `GET /api/auditoria` (só ADMIN).
+17. **Erros uniformes:** filtro global que converte erros de domínio e de validação em
+    `{ statusCode, erro, mensagem, detalhes? }` com mensagens claras em português (400, 401, 403, 404, 409, 422).
 
 ## Módulos e funcionalidades mínimas
 
@@ -90,8 +112,15 @@ sgh-connect/
 | Notificações | `GET /notificacoes` | adaptador `CanalNotificacao`; em dev, `ConsoleEmailAdapter` grava no banco e loga |
 | Relatórios | `GET /relatorios/ocupacao`, `/producao`, `/consultas` | projeções próprias atualizadas por eventos (sem JOIN em outros schemas) |
 
-Web: login; menu por perfil; telas de pacientes, profissionais, agenda, atendimento, mapa de leitos
-(cores por `StatusLeito`), contas, notificações e um dashboard de relatórios. Visual limpo, em português.
+Conflito de agenda e leito já ocupado retornam **409**. Inativar em vez de excluir registros com histórico
+(pacientes e profissionais).
+
+API documentada com **Swagger** em `/api/docs` (DTOs anotados, autenticação Bearer configurada).
+
+Web: login e logout; **menu lateral** filtrado por perfil; telas de pacientes, profissionais, agenda, atendimento,
+mapa de leitos (cores por `StatusLeito`), contas, notificações, auditoria (ADMIN) e um dashboard de relatórios.
+Toda listagem/formulário tem estados de **carregando, erro e vazio**; ações destrutivas (cancelar consulta, alta,
+fechar conta) pedem **confirmação**. Layout responsivo. Visual limpo, em português.
 
 ## Seed
 
@@ -101,8 +130,15 @@ Web: login; menu por perfil; telas de pacientes, profissionais, agenda, atendime
 ## Testes que precisam existir (evidências para o professor)
 
 - Domínio: conflito de agenda; `Leito.ocupar()` em leito não livre; `Cpf` válido/inválido.
+- Domínio: atendimento finalizado não aceita registro clínico.
 - Caso de uso: `InternarPacienteUseCase` com repositórios em memória (sem banco).
-- Concorrência: duas internações no mesmo leito → uma recebe 409.
+- Integração (e2e com banco de teste):
+  - agendamento conflitante → **409**;
+  - sem token → **401**; perfil sem permissão (ex.: RECEPCIONISTA lendo prontuário) → **403**;
+  - entrada inválida (CPF inválido, data mal formatada) → **400** com mensagem clara;
+  - duas internações **concorrentes** no mesmo leito (`Promise.all`) → uma 201 e uma **409**;
+  - alta encerra a internação e muda o leito na mesma transação (se a segunda escrita falhar, nada muda);
+  - auditoria registrada sem texto clínico.
 - Idempotência: mesmo `AtendimentoFinalizado` entregue 2x gera itens 1x na conta.
 - Arquitetura: `npm run arch:check` passa; crie um teste/demonstração que mostre a regra falhando se violada.
 
@@ -114,18 +150,24 @@ Web: login; menu por perfil; telas de pacientes, profissionais, agenda, atendime
 
 - `README.md`: como rodar (passo a passo do zero), usuários do seed, mapa módulo → pasta, link para o documento.
 - `docs/adr/ADR-01..ADR-07.md`: copie as decisões da seção 8 do documento (contexto, decisão, alternativas, consequências).
-- `docs/evidencias.md`: saída de `npm test` e `npm run arch:check`, e o grafo do dependency-cruiser
-  (`depcruise --output-type dot` → SVG/PNG se possível), para eu colocar prints no documento.
+- `docs/diagramas/*.md` em **Mermaid**, conferidos com o código real: módulos e dependências, sequência do
+  agendamento e fluxo de internação/alta.
+- `EVIDENCIAS_ARQUITETURA.md` (raiz) com a tabela
+  **critério | arquivo/caminho | trecho | justificativa | teste | status comprovado**, cobrindo coesão, acoplamento,
+  cada tipo de conascência da seção 7 do documento e a seção 12 (rastreabilidade). Inclua a saída real de
+  `npm test` e `npm run arch:check`, o grafo do dependency-cruiser (`depcruise --output-type dot`) e uma
+  **lista de capturas de tela** a tirar (qual tela/arquivo, o que deve aparecer, para qual seção do documento).
 
 ## Ordem de trabalho
 
 1. Monorepo, docker-compose, Prisma com schemas, `packages/shared`, dependency-cruiser **já com as regras**.
-2. Kernel `shared/` (eventos, outbox, worker, erros, auth guard).
+2. Kernel `shared/` (eventos, outbox, worker, filtro de erros, auth guard, auditoria) e Swagger.
 3. Identidade → Pacientes → Corpo Clínico.
 4. Agendamento → Atendimento → Internação.
 5. Faturamento → Notificações → Relatórios (só via eventos).
 6. Front-end por módulo.
 7. Seed, testes, README, ADRs, evidências.
 
-Ao final de cada etapa: rode testes e `arch:check`, faça um commit com mensagem clara, e me diga o que mudou.
+Ao final de cada etapa: rode testes e `arch:check`, faça um commit com mensagem clara, e me diga
+o que foi implementado, como executar/verificar, quais testes foram **realmente** rodados e o que ficou pendente.
 Ao terminar, liste qualquer ponto em que o código **diverge** do documento para eu ajustar a documentação.
