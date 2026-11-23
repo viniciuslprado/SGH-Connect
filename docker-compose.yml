@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sgh-connect-db
+    environment:
+      POSTGRES_USER: sgh
+      POSTGRES_PASSWORD: sgh_dev
+      POSTGRES_DB: sgh
+    ports:
+      - "5433:5432"   # 5433 para não colidir com um PostgreSQL local na 5432
+    volumes:
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+      - sgh-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sgh -d sgh"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  sgh-db-data:

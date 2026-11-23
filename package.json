@@ -1,0 +1,29 @@
+{
+  "name": "sgh-connect",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SGH Connect — Sistema Integrado de Gestão Hospitalar (monólito modular)",
+  "workspaces": [
+    "packages/shared",
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "build:shared": "npm run build -w @sgh/shared",
+    "db:migrate": "npm run build:shared && npm run prisma:migrate -w @sgh/api",
+    "seed": "npm run build:shared && npm run seed -w @sgh/api",
+    "dev": "npm run build:shared && concurrently -n api,web -c blue,green \"npm run dev -w @sgh/api\" \"npm run dev -w @sgh/web\"",
+    "test": "npm run build:shared && npm test -w @sgh/shared && npm test -w @sgh/api && npm run test:e2e -w @sgh/api && npm test -w @sgh/web",
+    "test:unit": "npm run build:shared && npm test -w @sgh/shared && npm test -w @sgh/api && npm test -w @sgh/web",
+    "arch:check": "depcruise apps/api/src --config .dependency-cruiser.cjs",
+    "arch:graph": "depcruise apps/api/src --config .dependency-cruiser.cjs --include-only \"^apps/api/src/modules\" --collapse \"^apps/api/src/modules/[^/]+\" --output-type dot > docs/diagramas/dependencias-reais.dot",
+    "build": "npm run build:shared && npm run build -w @sgh/api && npm run build -w @sgh/web"
+  },
+  "devDependencies": {
+    "concurrently": "9.1.0",
+    "dependency-cruiser": "17.3.10",
+    "typescript": "5.6.3"
+  }
+}

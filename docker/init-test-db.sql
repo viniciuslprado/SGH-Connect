@@ -1,0 +1,1 @@
+CREATE DATABASE sgh_test;

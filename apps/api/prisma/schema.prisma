@@ -1,0 +1,256 @@
+// SGH Connect — um schema PostgreSQL por módulo (documento, ADR-05 e seção 9).
+// Regra: NENHUMA relação/FK entre schemas diferentes. Referências entre módulos
+// são apenas identificadores (pacienteId, profissionalId...). Relações só existem
+// dentro do mesmo schema (ex.: Conta → ItemConta).
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["shared", "identidade", "pacientes", "corpo_clinico", "agendamento", "atendimento", "internacao", "faturamento", "notificacoes", "relatorios"]
+}
+
+// ---------------------------------------------------------------- shared (kernel)
+model OutboxEvento {
+  id           String    @id
+  tipo         String
+  payload      Json
+  criadoEm     DateTime  @default(now())
+  processadoEm DateTime?
+  tentativas   Int       @default(0)
+  ultimoErro   String?
+
+  @@index([processadoEm, criadoEm])
+  @@schema("shared")
+}
+
+model RegistroAuditoria {
+  id        String   @id @default(uuid())
+  atorId    String?
+  atorEmail String?
+  acao      String
+  entidade  String
+  entidadeId String?
+  criadoEm  DateTime @default(now())
+
+  @@index([criadoEm])
+  @@schema("shared")
+}
+
+// ---------------------------------------------------------------- identidade
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senhaHash String
+  perfil    String
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  @@schema("identidade")
+}
+
+// ---------------------------------------------------------------- pacientes
+model Paciente {
+  id                String   @id @default(uuid())
+  nome              String
+  cpf               String   @unique
+  nascimento        DateTime @db.Date
+  telefone          String?
+  email             String?
+  convenio          String
+  numeroCarteirinha String?
+  ativo             Boolean  @default(true)
+  criadoEm          DateTime @default(now())
+
+  @@index([nome])
+  @@schema("pacientes")
+}
+
+// ---------------------------------------------------------------- corpo clínico
+model Profissional {
+  id            String   @id @default(uuid())
+  nome          String
+  tipo          String
+  registro      String   @unique
+  especialidade String
+  usuarioId     String?  @unique // referência por id ao módulo Identidade (sem FK)
+  ativo         Boolean  @default(true)
+  criadoEm      DateTime @default(now())
+
+  @@schema("corpo_clinico")
+}
+
+// ---------------------------------------------------------------- agendamento
+model Consulta {
+  id             String   @id @default(uuid())
+  pacienteId     String
+  profissionalId String
+  inicio         DateTime
+  fim            DateTime
+  status         String
+  sala           String?
+  observacao     String?
+  criadoEm       DateTime @default(now())
+
+  @@index([profissionalId, inicio])
+  @@schema("agendamento")
+}
+
+// ---------------------------------------------------------------- atendimento
+model Atendimento {
+  id             String    @id @default(uuid())
+  pacienteId     String
+  profissionalId String
+  consultaId     String?
+  status         String
+  inicio         DateTime  @default(now())
+  fim            DateTime?
+  triagem        Triagem?
+  registros      RegistroClinico[]
+
+  @@index([status])
+  @@schema("atendimento")
+}
+
+model Triagem {
+  id                  String      @id @default(uuid())
+  atendimentoId       String      @unique
+  atendimento         Atendimento @relation(fields: [atendimentoId], references: [id])
+  classificacaoRisco  String
+  queixaPrincipal     String
+  pressaoArterial     String?
+  temperatura         Float?
+  frequenciaCardiaca  Int?
+  saturacao           Int?
+  registradaPor       String
+  registradaEm        DateTime    @default(now())
+
+  @@schema("atendimento")
+}
+
+model RegistroClinico {
+  id            String      @id @default(uuid())
+  atendimentoId String
+  atendimento   Atendimento @relation(fields: [atendimentoId], references: [id])
+  autorId       String
+  anamnese      String?
+  cid           String?
+  conduta       String
+  prescricao    String?
+  criadoEm      DateTime    @default(now())
+
+  @@schema("atendimento")
+}
+
+// ---------------------------------------------------------------- internação e leitos
+model Leito {
+  id       String @id @default(uuid())
+  codigo   String @unique
+  ala      String
+  tipo     String
+  status   String
+  versao   Int    @default(0) // controle de concorrência otimista (conascência temporal)
+
+  @@schema("internacao")
+}
+
+model Internacao {
+  id         String    @id @default(uuid())
+  pacienteId String
+  leitoId    String
+  motivo     String
+  status     String
+  inicio     DateTime  @default(now())
+  alta       DateTime?
+
+  @@index([leitoId, status])
+  @@index([pacienteId, status])
+  @@schema("internacao")
+}
+
+// ---------------------------------------------------------------- faturamento
+model Conta {
+  id         String      @id @default(uuid())
+  pacienteId String
+  convenio   String
+  status     String
+  total      Decimal     @default(0) @db.Decimal(12, 2)
+  abertaEm   DateTime    @default(now())
+  fechadaEm  DateTime?
+  itens      ItemConta[]
+
+  @@index([pacienteId, status])
+  @@schema("faturamento")
+}
+
+model ItemConta {
+  id            String   @id @default(uuid())
+  contaId       String
+  conta         Conta    @relation(fields: [contaId], references: [id])
+  codigo        String
+  descricao     String
+  quantidade    Int
+  valorUnitario Decimal  @db.Decimal(12, 2)
+  origemEventoId String
+  criadoEm      DateTime @default(now())
+
+  @@schema("faturamento")
+}
+
+model EventoProcessadoFaturamento {
+  eventId      String   @id
+  processadoEm DateTime @default(now())
+
+  @@schema("faturamento")
+}
+
+// ---------------------------------------------------------------- notificações
+model Notificacao {
+  id         String   @id @default(uuid())
+  eventId    String   @unique // idempotência: um evento gera no máximo uma notificação
+  pacienteId String
+  canal      String
+  destino    String
+  assunto    String
+  mensagem   String
+  status     String
+  enviadaEm  DateTime @default(now())
+
+  @@schema("notificacoes")
+}
+
+// ---------------------------------------------------------------- relatórios (projeções de leitura)
+model ProjecaoConsultas {
+  consultaId     String   @id
+  profissionalId String
+  inicio         DateTime
+  status         String
+  atualizadoEm   DateTime @updatedAt
+
+  @@schema("relatorios")
+}
+
+model ProjecaoProducao {
+  atendimentoId    String   @id
+  profissionalId   String
+  profissionalNome String
+  finalizadoEm     DateTime
+
+  @@schema("relatorios")
+}
+
+model ProjecaoOcupacao {
+  internacaoId String    @id
+  leitoCodigo  String
+  ala          String
+  tipoLeito    String
+  inicio       DateTime
+  alta         DateTime?
+
+  @@schema("relatorios")
+}
