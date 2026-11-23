@@ -19,7 +19,7 @@ O documento arquitetural completo está em [`docs/SGH_Connect_Documentacao_Arqui
 ## Como rodar no seu computador
 
 Leva uns 10 minutos na primeira vez. Os comandos abaixo são para o **PowerShell** do Windows
-(no Mac/Linux use o Terminal; a única diferença está no passo 4).
+(no Mac/Linux use o Terminal; a única diferença está no passo 3).
 
 ### 1. Instale os programas (só na primeira vez)
 
@@ -40,12 +40,9 @@ node -v
 docker --version
 ```
 
-### 2. Peça acesso ao repositório
+### 2. Baixe o projeto
 
-O repositório é **privado**. Peça para o dono (`viniciuslprado`) adicionar o seu usuário do GitHub como
-colaborador e aceite o convite que chega por e-mail. Na primeira vez que o Git pedir login, entre com a sua conta do GitHub.
-
-### 3. Baixe o projeto
+O repositório é público: não precisa de conta no GitHub. Escolha uma pasta (por exemplo, Documentos), abra o PowerShell nela e rode:
 
 ```powershell
 git clone https://github.com/viniciuslprado/SGH-Connect.git
@@ -55,7 +52,7 @@ git clone https://github.com/viniciuslprado/SGH-Connect.git
 cd SGH-Connect
 ```
 
-### 4. Instale as dependências e crie o arquivo de configuração
+### 3. Instale as dependências e crie o arquivo de configuração
 
 ```powershell
 npm install
@@ -67,7 +64,7 @@ Copy-Item .env.example apps/api/.env
 
 > No Mac/Linux, o segundo comando é `cp .env.example apps/api/.env`.
 
-### 5. Suba o banco de dados e carregue os dados de exemplo
+### 4. Suba o banco de dados e carregue os dados de exemplo
 
 Com o Docker Desktop aberto:
 
@@ -86,7 +83,7 @@ npm run seed
 O `seed` cria usuários, profissionais, 15 pacientes fictícios, 20 leitos e 8 consultas para o dia seguinte.
 Ele **apaga e recria** os dados, então pode rodar de novo sempre que quiser voltar ao estado inicial.
 
-### 6. Rode o sistema
+### 5. Rode o sistema
 
 ```powershell
 npm run dev
@@ -97,7 +94,7 @@ Espere aparecer `API em http://localhost:3333/api` no terminal e abra no navegad
 - **Sistema:** http://localhost:5173
 - **Documentação da API (Swagger):** http://localhost:3333/api/docs
 
-### 7. Entre com um dos usuários de teste
+### 6. Entre com um dos usuários de teste
 
 A senha de todos é **`sgh@2026`**. Cada perfil vê um menu diferente.
 
@@ -110,7 +107,7 @@ A senha de todos é **`sgh@2026`**. Cada perfil vê um menu diferente.
 | Gestor de leitos | `leitos@sgh.local` | mapa de leitos, internar, transferir, alta |
 | Faturista | `faturamento@sgh.local` | contas hospitalares |
 
-### 8. Para parar
+### 7. Para parar
 
 No terminal do `npm run dev`, aperte **Ctrl + C**. Para desligar o banco:
 
@@ -145,7 +142,7 @@ Os dados ficam guardados. Da próxima vez basta abrir o Docker Desktop e rodar `
 | A página abre mas o login não funciona | Confira se o terminal do `npm run dev` mostra `API em http://localhost:3333/api` e se você rodou `npm run seed`. |
 | `@prisma/client did not initialize yet` | Rode `npm run prisma:generate -w @sgh/api` e depois `npm run dev`. |
 | `npm` não é reconhecido | Feche e abra o PowerShell depois de instalar o Node.js. |
-| `git clone` dá *Repository not found* | Você ainda não tem acesso ao repositório privado (passo 2). |
+| `git` não é reconhecido | Instale o Git e abra um novo PowerShell. Alternativa sem Git: no GitHub, *Code → Download ZIP*, extraia e abra o PowerShell dentro da pasta extraída. |
 
 ---
 
