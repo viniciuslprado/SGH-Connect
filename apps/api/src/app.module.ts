@@ -8,6 +8,9 @@ import { CorpoClinicoModule } from './modules/corpo-clinico/corpo-clinico.module
 import { AgendamentoModule } from './modules/agendamento/agendamento.module';
 import { AtendimentoModule } from './modules/atendimento/atendimento.module';
 import { InternacaoModule } from './modules/internacao/internacao.module';
+import { FaturamentoModule } from './modules/faturamento/faturamento.module';
+import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
+import { RelatoriosModule } from './modules/relatorios/relatorios.module';
 
 /**
  * Raiz da composição. É o ÚNICO lugar que conhece todos os módulos:
@@ -27,6 +30,10 @@ import { InternacaoModule } from './modules/internacao/internacao.module';
     AgendamentoModule,
     AtendimentoModule,
     InternacaoModule,
+    // módulos de saída: só reagem a eventos (Ca = 0)
+    FaturamentoModule,
+    NotificacoesModule,
+    RelatoriosModule,
   ],
 })
 export class AppModule {}
