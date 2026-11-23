@@ -508,7 +508,7 @@ c.push(P("Entre módulos, o SGH Connect só apresenta conascência de **nome** e
 
 // ---------------------------------------------------------------- 8
 c.push(H1("8. Justificativas arquiteturais (ADRs)"));
-c.push(P("As decisões são registradas no formato ADR (Architecture Decision Record), recomendado por Richards e Ford: contexto, decisão, alternativas e consequências. Cópias em Markdown ficam em `docs/adr/` no repositório."));
+c.push(P("As decisões são registradas no formato ADR (Architecture Decision Record), recomendado por Richards e Ford: contexto, decisão, alternativas e consequências. Um resumo de todas elas, com onde verificar cada uma no código, está no `README.md` do repositório."));
 const adr = (t, ctx, dec, alt, cons) => {
   c.push(H2(t));
   c.push(P(`**Contexto:** ${ctx}`));
@@ -612,10 +612,10 @@ c.push(T(["Decisão / conceito", "Onde verificar no código", "Evidência espera
   ["Conascência temporal reduzida", "Coluna `versao` em Leito (`internacao/infrastructure/repositorios.ts`); `EventoProcessadoFaturamento`", "Testes e2e de concorrência, alta atômica e idempotência"],
   ["Coesão por módulo", "Testes em `modules/<m>/**/*.spec.ts`", "Testes de domínio sem banco"],
   ["Violação reprovada", "`apps/api/test/arch-fixture` + `npm run arch:demo`", "Regra `somente-contratos-entre-modulos` falha"],
-  ["Diagrama a partir do código", "`docs/diagramas/modulos-dependencias-reais.md` (`npm run arch:mermaid`)", "Grafo e métricas Ca/Ce medidos"],
+  ["Diagrama a partir do código", "`README.md`, seção Diagramas (`npm run arch:mermaid`)", "Grafo e métricas Ca/Ce medidos"],
   ["Testes de ponta a ponta", "`apps/api/test/sgh.e2e-spec.ts`", "22 testes e2e contra banco de teste"],
   ["Segurança e auditoria", "`shared/auditoria/` + testes e2e", "401 sem token, 403 sem perfil, log sem texto clínico"],
-  ["Evidências consolidadas", "`EVIDENCIAS_ARQUITETURA.md`", "Tabela critério × arquivo × teste × status"],
+  ["Evidências consolidadas", "`README.md`, seção Evidências", "Tabela critério × arquivo × teste × status"],
 ], [2700, 3600, 2726]));
 
 // ---------------------------------------------------------------- 13
@@ -639,7 +639,7 @@ c.push(P("Os testes e2e cobrem os cenários críticos descritos nas seções 6 e
   "Duas internações simultâneas no mesmo leito → uma 201 e uma 409; alta com falha simulada no meio da transação não altera nada.",
   "O mesmo evento `AtendimentoFinalizado` entregue duas vezes gera os itens da conta e a notificação uma única vez.",
 ].forEach((t) => c.push(B(t)));
-c.push(P("Evidências detalhadas (arquivo, trecho, teste e status de cada critério) estão em `EVIDENCIAS_ARQUITETURA.md`, na raiz do repositório."));
+c.push(P("Evidências detalhadas (arquivo, trecho, teste e status de cada critério) estão no `README.md` do repositório, seção Evidências arquiteturais."));
 
 c.push(H1n("14. Referências"));
 [

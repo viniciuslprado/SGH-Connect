@@ -1,11 +1,12 @@
 /**
- * Gera docs/diagramas/modulos-dependencias-reais.md (Mermaid) a partir das importações
- * REAIS do código, usando o dependency-cruiser. Assim o diagrama não pode divergir da implementação.
+ * Atualiza a seção "Dependências reais entre módulos" do README.md (Mermaid + métricas Ca/Ce)
+ * a partir das importações REAIS do código, usando o dependency-cruiser.
+ * Assim o diagrama não pode divergir da implementação.
  *
  * Uso: npm run arch:mermaid
  */
 import { execSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const json = JSON.parse(
   execSync('npx depcruise apps/api/src --config .dependency-cruiser.cjs --output-type json', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }),
@@ -70,25 +71,31 @@ const detalhe = [...arestas.entries()]
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([k, arquivos]) => `- **${k.replace('->', ' → ')}**: ${[...arquivos].map((a) => `\`${a}\``).join(', ')}`);
 
-writeFileSync(
-  'docs/diagramas/modulos-dependencias-reais.md',
-  [
-    '# Dependências reais entre módulos (gerado automaticamente)',
-    '',
-    `> Gerado por \`npm run arch:mermaid\` em ${new Date().toISOString()} a partir das importações do código`,
-    '> (dependency-cruiser). Uma seta A → B significa: algum arquivo de A importa `B/contracts`.',
-    '> Nenhuma seta aponta para fora de `contracts/` — isso é garantido por `npm run arch:check`.',
-    '',
-    ...linhas,
-    '',
-    '## Métricas de acoplamento calculadas do código',
-    '',
-    ...tabela,
-    '',
-    '## Arquivos que originam cada dependência',
-    '',
-    ...detalhe,
-    '',
-  ].join('\n'),
-);
-console.log(`ok: ${arestas.size} dependências entre módulos → docs/diagramas/modulos-dependencias-reais.md`);
+const INICIO = '<!-- dependencias:inicio -->';
+const FIM = '<!-- dependencias:fim -->';
+const secao = [
+  INICIO,
+  `> Gerado por \`npm run arch:mermaid\` em ${new Date().toISOString().slice(0, 10)} a partir das importações do código`,
+  '> (dependency-cruiser). Uma seta A → B significa: algum arquivo de A importa `B/contracts`.',
+  '> Nenhuma seta aponta para fora de `contracts/`, e isso é garantido por `npm run arch:check`.',
+  '',
+  ...linhas,
+  '',
+  '**Métricas de acoplamento medidas no código** (Ca = quantos módulos dependem dele; Ce = de quantos ele depende):',
+  '',
+  ...tabela,
+  '',
+  '<details><summary>Arquivos que originam cada dependência</summary>',
+  '',
+  ...detalhe,
+  '',
+  '</details>',
+  FIM,
+].join('\n');
+
+const readme = readFileSync('README.md', 'utf8');
+const ini = readme.indexOf(INICIO);
+const fim = readme.indexOf(FIM);
+if (ini < 0 || fim < 0) throw new Error(`README.md precisa conter os marcadores ${INICIO} e ${FIM}`);
+writeFileSync('README.md', readme.slice(0, ini) + secao + readme.slice(fim + FIM.length));
+console.log(`ok: ${arestas.size} dependências entre módulos → README.md (seção Diagramas)`);
