@@ -5,3 +5,4 @@ coverage/
 *.log
 apps/api/.env
 apps/web/.env
+*.tsbuildinfo
