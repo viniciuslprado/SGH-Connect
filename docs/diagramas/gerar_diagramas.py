@@ -99,7 +99,7 @@ def c4_conteineres():
     ax.text(5, 41.5, "SGH Connect  [fronteira do sistema]", fontsize=8, color=AZUL, fontweight="bold")
     caixa(ax, 6, 22, 28, 14, "sgh-connect-web", "[SPA — React + TypeScript]\ntelas por módulo,\nconsome API REST",
           cor=AZUL, fundo=AZUL_CLARO, fs=9)
-    caixa(ax, 41, 22, 30, 14, "sgh-connect-api", "[NestJS + TypeScript]\nmonólito modular\n(8 módulos + barramento de eventos)",
+    caixa(ax, 41, 22, 30, 14, "sgh-connect-api", "[NestJS + TypeScript]\nmonólito modular\n(9 módulos + barramento de eventos)",
           cor=AZUL, fundo=AZUL_CLARO, fs=9)
     caixa(ax, 78, 22, 26, 14, "Banco de Dados", "[PostgreSQL]\num schema por módulo\n(pacientes, agenda, ...)",
           cor=VERDE, fundo=VERDE_CLARO, fs=9)

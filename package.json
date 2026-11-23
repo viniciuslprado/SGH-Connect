@@ -18,6 +18,7 @@
     "test": "npm run build:shared && npm test -w @sgh/shared && npm test -w @sgh/api && npm run test:e2e -w @sgh/api && npm test -w @sgh/web",
     "test:unit": "npm run build:shared && npm test -w @sgh/shared && npm test -w @sgh/api && npm test -w @sgh/web",
     "arch:check": "depcruise apps/api/src --config .dependency-cruiser.cjs",
+    "docs:word": "node docs/gerar_documento.js",
     "arch:mermaid": "node scripts/gerar-diagrama-modulos.mjs",
     "arch:demo": "depcruise apps/api/test/arch-fixture --config .dependency-cruiser.cjs",
     "arch:graph": "depcruise apps/api/src --config .dependency-cruiser.cjs --include-only \"^apps/api/src/modules\" --collapse \"^apps/api/src/modules/[^/]+\" --output-type dot > docs/diagramas/dependencias-reais.dot",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "concurrently": "9.1.0",
     "dependency-cruiser": "17.3.10",
+    "docx": "9.16.0",
     "typescript": "5.6.3"
   }
 }

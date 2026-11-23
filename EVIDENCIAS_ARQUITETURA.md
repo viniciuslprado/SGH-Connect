@@ -132,7 +132,9 @@ x 1 dependency violations (1 errors, 0 warnings).
 | 10 | Swagger | http://localhost:3333/api/docs | 2.3 Tecnologias |
 | 11 | Trechos de código: `enums.ts`, `cpf.ts`, `agendar-consulta.command.ts`, `internar-paciente.use-case.ts`, `repositorios.ts` (UPDATE com versão) | editor | 7.2 a 7.8 |
 
-## 7. Divergências entre código e documento (para ajustar o .docx)
+## 7. Divergências encontradas entre código e documento
+
+> **Status:** todas corrigidas no documento (`docs/SGH_Connect_Documentacao_Arquitetural.docx/.pdf`) em 23/11/2026 — tabela 6.2 com valores medidos, seção 5.3, trechos 7.2–7.8, tabela 4, modelo de dados, tecnologias e nova seção 13 "Resultados da implementação".
 
 1. **Ce na tabela 6.2:** o documento não contou a dependência de todos os módulos em Identidade (`@Perfis`). Medido no código: Pacientes Ce = 1 (I = 0,17), Corpo Clínico 1 (0,33), Agendamento 3 (0,60), Atendimento 3 (0,50), Internação 2 (0,50), Faturamento/Notificações/Relatórios 4 (1,00). **Ca é idêntico ao documento.** As conclusões (dependências estáveis, sem ciclos) não mudam.
 2. **Seção 5.3 ("um método `executar()` por caso de uso"):** vale para os comandos. As consultas de leitura de um mesmo módulo foram agrupadas (ex.: `ConsultarPacientesUseCase.pesquisar/obter`, `GerenciarLeitosUseCase.cadastrar/liberar/manutencao`).
