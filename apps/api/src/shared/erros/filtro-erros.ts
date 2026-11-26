@@ -52,9 +52,11 @@ export class FiltroErrosGlobal implements ExceptionFilter {
     return this.corpo(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro interno inesperado.');
   }
 
+  /** Usa a mensagem específica quando houver (ex.: "E-mail ou senha inválidos."); senão, um texto padrão. */
   private mensagemPadrao(status: number, msg?: string): string {
-    if (status === 401) return 'Faça login para acessar este recurso.';
-    if (status === 403) return 'Seu perfil não tem permissão para esta ação.';
+    const generica = !msg || msg === 'Unauthorized' || msg === 'Forbidden';
+    if (status === 401) return generica ? 'Faça login para acessar este recurso.' : msg;
+    if (status === 403) return generica ? 'Seu perfil não tem permissão para esta ação.' : msg;
     return msg ?? NOMES[status] ?? 'Erro';
   }
 

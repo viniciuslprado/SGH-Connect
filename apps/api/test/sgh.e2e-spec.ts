@@ -20,6 +20,11 @@ describe('Segurança (RBAC) e validação de entrada', () => {
     expect(r.body).toEqual({ statusCode: 401, erro: 'Não autenticado', mensagem: 'Faça login para acessar este recurso.' });
   });
 
+  it('login com senha errada → 401 com mensagem específica', async () => {
+    const r = await c.http().post('/api/auth/login').send({ email: 'admin@teste.local', senha: 'errada' }).expect(401);
+    expect(r.body.mensagem).toBe('E-mail ou senha inválidos.');
+  });
+
   it('token inválido → 401', async () => {
     await c.http().get('/api/pacientes').set(bearer('token.falso.qualquer')).expect(401);
   });

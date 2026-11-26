@@ -19,7 +19,7 @@ O documento arquitetural completo está em [`docs/SGH_Connect_Documentacao_Arqui
 ## Como rodar no seu computador
 
 Leva uns 10 minutos na primeira vez. Os comandos abaixo são para o **PowerShell** do Windows
-(no Mac/Linux use o Terminal; a única diferença está no passo 3).
+(no Mac/Linux use o Terminal; os comandos são os mesmos).
 
 ### 1. Instale os programas (só na primeira vez)
 
@@ -52,17 +52,13 @@ git clone https://github.com/viniciuslprado/SGH-Connect.git
 cd SGH-Connect
 ```
 
-### 3. Instale as dependências e crie o arquivo de configuração
+### 3. Instale as dependências
 
 ```powershell
 npm install
 ```
 
-```powershell
-Copy-Item .env.example apps/api/.env
-```
-
-> No Mac/Linux, o segundo comando é `cp .env.example apps/api/.env`.
+O `npm install` também cria sozinho o arquivo de configuração `apps/api/.env` (a partir do `.env.example`).
 
 ### 4. Suba o banco de dados e carregue os dados de exemplo
 
@@ -139,8 +135,9 @@ Os dados ficam guardados. Da próxima vez basta abrir o Docker Desktop e rodar `
 |---|---|
 | `error during connect` / `docker daemon is not running` | Abra o Docker Desktop e espere *Engine running*. |
 | `port is already allocated` na porta 5433 | Outro programa usa a porta. Troque `5433` em `docker-compose.yml` e no `apps/api/.env`. |
-| A página abre mas o login não funciona | Confira se o terminal do `npm run dev` mostra `API em http://localhost:3333/api` e se você rodou `npm run seed`. |
-| `@prisma/client did not initialize yet` | Rode `npm run prisma:generate -w @sgh/api` e depois `npm run dev`. |
+| Login mostra *"E-mail ou senha inválidos"* ou *"Faça login para acessar este recurso"* | Os usuários de teste não foram criados. Rode `npm run seed` (com o Docker aberto) e tente de novo com a senha `sgh@2026`. |
+| A página abre mas o login não responde | Confira se o terminal do `npm run dev` mostra `API em http://localhost:3333/api` e se você rodou `npm run seed`. |
+| `@prisma/client did not initialize yet` ou `Environment variable not found: DATABASE_URL` | Rode `npm install` de novo (ele recria o `apps/api/.env` se faltar e regenera o Prisma Client) e depois `npm run seed`. |
 | `npm` não é reconhecido | Feche e abra o PowerShell depois de instalar o Node.js. |
 | `git` não é reconhecido | Instale o Git e abra um novo PowerShell. Alternativa sem Git: no GitHub, *Code → Download ZIP*, extraia e abra o PowerShell dentro da pasta extraída. |
 

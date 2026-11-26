@@ -3,6 +3,7 @@
  * Recria todos os dados: usuários (um por perfil), profissionais, pacientes, leitos e consultas.
  * Uso: npm run seed   (senha de todos os usuários: sgh@2026)
  */
+import 'dotenv/config'; // lê apps/api/.env (DATABASE_URL) independentemente de como o Prisma Client foi gerado
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Convenio, Cpf, Perfil, StatusConsulta, StatusLeito, TipoLeito, TipoProfissional } from '@sgh/shared';
 import * as bcrypt from 'bcryptjs';
