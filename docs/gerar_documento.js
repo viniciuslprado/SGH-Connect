@@ -643,11 +643,11 @@ c.push(P("Evidências detalhadas (arquivo, trecho, teste e status de cada crité
 
 c.push(H1n("14. Referências"));
 [
-  "BRASIL. Lei nº 13.709, de 14 de agosto de 2018. Lei Geral de Proteção de Dados Pessoais (LGPD). **Diário Oficial da União**: seção 1, Brasília, DF, 15 ago. 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 26 nov. 2026.",
-  "BROWN, Simon. **The C4 model for visualising software architecture**. Disponível em: https://c4model.com. Acesso em: 26 nov. 2026.",
+  "BRASIL. Lei nº 13.709, de 14 de agosto de 2018. Lei Geral de Proteção de Dados Pessoais (LGPD). **Diário Oficial da União**: seção 1, Brasília, DF, 15 ago. 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 24 nov. 2026.",
+  "BROWN, Simon. **The C4 model for visualising software architecture**. Disponível em: https://c4model.com. Acesso em: 24 nov. 2026.",
   "MARTIN, Robert C. **Arquitetura limpa**: o guia do artesão para estrutura e design de software. Rio de Janeiro: Alta Books, 2019. ISBN 978-85-508-0460-6.",
-  "PAGE-JONES, Meilir. **What every programmer should know about object-oriented design**. New York: Dorset House, 1995. ISBN 978-0-932633-31-6.",
-  "RICHARDS, Mark; FORD, Neal. **Fundamentos da arquitetura de software**: uma abordagem de engenharia. Rio de Janeiro: Alta Books, 2024. Tradução de: Fundamentals of software architecture: an engineering approach. Sebastopol: O'Reilly Media, 2020.",
+  "PAGE-JONES, Meilir. **What every programmer should know about object-oriented design**. New York: Dorset House, 1995. ISBN 978-0-932633-31-6. Disponível em: https://dorsethouse.com/books/weps.html. Acesso em: 24 nov. 2026.",
+  "RICHARDS, Mark; FORD, Neal. **Fundamentos da arquitetura de software**: uma abordagem de engenharia. Rio de Janeiro: Alta Books, 2024. Amostra disponível em: https://altabooks.com.br/wp-content/uploads/2024/04/AMOSTRA_FundamentosdaArquiteturadeSoftware.pdf. Acesso em: 24 nov. 2026. Tradução de: Fundamentals of software architecture: an engineering approach. Sebastopol: O'Reilly Media, 2020. ISBN 978-1-4920-4345-4.",
 ].forEach((t) => c.push(P(t, { alignment: AlignmentType.LEFT })));
 
 // ---------------------------------------------------------------- documento
