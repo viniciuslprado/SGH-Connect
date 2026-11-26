@@ -40,7 +40,7 @@ node -v
 docker --version
 ```
 
-### 2. Baixe o projeto
+### 2. Baixe o projeto e abra no VS Code
 
 O repositório é público: não precisa de conta no GitHub. Escolha uma pasta (por exemplo, Documentos), abra o PowerShell nela e rode:
 
@@ -48,38 +48,24 @@ O repositório é público: não precisa de conta no GitHub. Escolha uma pasta (
 git clone https://github.com/viniciuslprado/SGH-Connect.git
 ```
 
-```powershell
-cd SGH-Connect
-```
+No VS Code: **File → Open Folder → SGH-Connect** e depois **Terminal → New Terminal**.
+O terminal do VS Code já abre dentro da pasta do projeto (não precisa de `cd`).
 
-### 3. Instale as dependências
+### 3. Três comandos, nesta ordem (com o Docker Desktop aberto)
+
+| # | Comando | O que faz | Quando rodar |
+|---|---|---|---|
+| 1 | `npm install` | baixa as dependências e cria sozinho o arquivo `apps/api/.env` | só na primeira vez (e depois de um `git pull`) |
+| 2 | `npm run banco` | sobe o PostgreSQL no Docker, cria as tabelas e carrega os dados de exemplo | só na primeira vez (ou para voltar os dados ao estado inicial) |
+| 3 | `npm run dev` | liga o banco (se estiver desligado), o **backend** e o **frontend** juntos | sempre que for usar |
 
 ```powershell
 npm install
 ```
 
-O `npm install` também cria sozinho o arquivo de configuração `apps/api/.env` (a partir do `.env.example`).
-
-### 4. Suba o banco de dados e carregue os dados de exemplo
-
-Com o Docker Desktop aberto:
-
 ```powershell
-npm run db:up
+npm run banco
 ```
-
-```powershell
-npm run db:migrate
-```
-
-```powershell
-npm run seed
-```
-
-O `seed` cria usuários, profissionais, 15 pacientes fictícios, 20 leitos e 8 consultas para o dia seguinte.
-Ele **apaga e recria** os dados, então pode rodar de novo sempre que quiser voltar ao estado inicial.
-
-### 5. Rode o sistema
 
 ```powershell
 npm run dev
@@ -90,7 +76,10 @@ Espere aparecer `API em http://localhost:3333/api` no terminal e abra no navegad
 - **Sistema:** http://localhost:5173
 - **Documentação da API (Swagger):** http://localhost:3333/api/docs
 
-### 6. Entre com um dos usuários de teste
+> O `npm run banco` **apaga e recria** os dados de exemplo (7 usuários, 5 profissionais, 15 pacientes fictícios,
+> 20 leitos e 8 consultas para o dia seguinte). Rode de novo sempre que quiser voltar ao estado inicial.
+
+### 4. Entre com um dos usuários de teste
 
 A senha de todos é **`sgh@2026`**. Cada perfil vê um menu diferente.
 
@@ -103,15 +92,11 @@ A senha de todos é **`sgh@2026`**. Cada perfil vê um menu diferente.
 | Gestor de leitos | `leitos@sgh.local` | mapa de leitos, internar, transferir, alta |
 | Faturista | `faturamento@sgh.local` | contas hospitalares |
 
-### 7. Para parar
+### 5. Para parar e para voltar depois
 
-No terminal do `npm run dev`, aperte **Ctrl + C**. Para desligar o banco:
-
-```powershell
-npm run db:down
-```
-
-Os dados ficam guardados. Da próxima vez basta abrir o Docker Desktop e rodar `npm run db:up` e `npm run dev`.
+- **Parar:** no terminal do `npm run dev`, aperte **Ctrl + C**. Para desligar também o banco: `npm run db:down`.
+- **Voltar outro dia:** abra o Docker Desktop e rode só `npm run dev`. Os dados ficam guardados.
+- **Já tinha baixado uma versão antiga?** Rode `git pull`, depois `npm install`, `npm run banco` e `npm run dev`.
 
 ---
 
@@ -135,9 +120,9 @@ Os dados ficam guardados. Da próxima vez basta abrir o Docker Desktop e rodar `
 |---|---|
 | `error during connect` / `docker daemon is not running` | Abra o Docker Desktop e espere *Engine running*. |
 | `port is already allocated` na porta 5433 | Outro programa usa a porta. Troque `5433` em `docker-compose.yml` e no `apps/api/.env`. |
-| Login mostra *"E-mail ou senha inválidos"* ou *"Faça login para acessar este recurso"* | Os usuários de teste não foram criados. Rode `npm run seed` (com o Docker aberto) e tente de novo com a senha `sgh@2026`. |
-| A página abre mas o login não responde | Confira se o terminal do `npm run dev` mostra `API em http://localhost:3333/api` e se você rodou `npm run seed`. |
-| `@prisma/client did not initialize yet` ou `Environment variable not found: DATABASE_URL` | Rode `npm install` de novo (ele recria o `apps/api/.env` se faltar e regenera o Prisma Client) e depois `npm run seed`. |
+| Login mostra *"E-mail ou senha inválidos"* ou *"Faça login para acessar este recurso"* | Os usuários de teste não foram criados. Rode `npm run banco` (com o Docker aberto) e tente de novo com a senha `sgh@2026`. |
+| A página abre mas o login não responde | Confira se o terminal do `npm run dev` mostra `API em http://localhost:3333/api` e se você rodou `npm run banco`. |
+| `@prisma/client did not initialize yet` ou `Environment variable not found: DATABASE_URL` | Rode `npm install` de novo (ele recria o `apps/api/.env` se faltar e regenera o Prisma Client) e depois `npm run banco`. |
 | `npm` não é reconhecido | Feche e abra o PowerShell depois de instalar o Node.js. |
 | `git` não é reconhecido | Instale o Git e abra um novo PowerShell. Alternativa sem Git: no GitHub, *Code → Download ZIP*, extraia e abra o PowerShell dentro da pasta extraída. |
 
