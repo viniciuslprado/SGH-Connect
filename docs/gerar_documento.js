@@ -643,11 +643,11 @@ c.push(P("Evidências detalhadas (arquivo, trecho, teste e status de cada crité
 
 c.push(H1n("14. Referências"));
 [
-  "RICHARDS, Mark; FORD, Neal. **Fundamentos da Arquitetura de Software: uma abordagem de engenharia**. Rio de Janeiro: Alta Books, 2024.",
-  "PAGE-JONES, Meilir. **What Every Programmer Should Know About Object-Oriented Design**. Dorset House, 1995.",
-  "BROWN, Simon. **The C4 model for visualising software architecture**. Disponível em: https://c4model.com.",
-  "MARTIN, Robert C. **Arquitetura Limpa**. Rio de Janeiro: Alta Books, 2019.",
-  "BRASIL. Lei nº 13.709/2018 — Lei Geral de Proteção de Dados Pessoais (LGPD).",
+  "BRASIL. Lei nº 13.709, de 14 de agosto de 2018. Lei Geral de Proteção de Dados Pessoais (LGPD). **Diário Oficial da União**: seção 1, Brasília, DF, 15 ago. 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. Acesso em: 26 nov. 2026.",
+  "BROWN, Simon. **The C4 model for visualising software architecture**. Disponível em: https://c4model.com. Acesso em: 26 nov. 2026.",
+  "MARTIN, Robert C. **Arquitetura limpa**: o guia do artesão para estrutura e design de software. Rio de Janeiro: Alta Books, 2019. ISBN 978-85-508-0460-6.",
+  "PAGE-JONES, Meilir. **What every programmer should know about object-oriented design**. New York: Dorset House, 1995. ISBN 978-0-932633-31-6.",
+  "RICHARDS, Mark; FORD, Neal. **Fundamentos da arquitetura de software**: uma abordagem de engenharia. Rio de Janeiro: Alta Books, 2024. Tradução de: Fundamentals of software architecture: an engineering approach. Sebastopol: O'Reilly Media, 2020.",
 ].forEach((t) => c.push(P(t, { alignment: AlignmentType.LEFT })));
 
 // ---------------------------------------------------------------- documento
